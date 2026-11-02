@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stationery Inventory · Project Proposal</title>
+  <meta name="description" content="A project proposal for Design, Build, Ship: an inventory of the stationery you own, where it lives, and what's still waiting to be used.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect x='12' y='5' width='28' height='38' rx='3' fill='%234b4f63' stroke='%233b2f3a' stroke-width='2'/%3E%3Crect x='19' y='11' width='15' height='9' rx='1.5' fill='%23fffdf8'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&family=Pixelify+Sans:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #3b2f3a;
+      --cream: #fff6e6;
+      --paper: #fffdf8;
+      --slot: #f3e6cf;
+      --slot-edge: #e2cfae;
+      --blush: #f7cfc8;
+      --mint: #cfe9da;
+      --butter: #fff2c9;
+      --gold: #f5a524;
+      --muted: #6f5f6a;
+      --focus: #4f7fc4;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background-color: #f4e7d2;
+      background-image: radial-gradient(#e0cba9 1.2px, transparent 1.4px);
+      background-size: 22px 22px;
+      color: var(--ink);
+      font: 500 17px/1.6 'Nunito', system-ui, sans-serif;
+    }
+    main { max-width: 840px; margin: 0 auto; padding: 32px 16px 56px; display: grid; gap: 28px; }
+    :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+    h1, h2, h3, .pixel { font-family: 'Pixelify Sans', ui-monospace, monospace; font-weight: 700; line-height: 1.15; }
+    h1 { font-size: clamp(2.3rem, 8vw, 3.5rem); margin: 6px 0 14px; }
+    h2 { font-size: 1.6rem; margin: 0 0 14px; display: flex; align-items: center; gap: 10px; }
+    h2 .num { font-size: .8rem; background: var(--blush); border: 2px solid var(--ink); border-radius: 8px; padding: 1px 7px; }
+    h3 { font-size: 1.05rem; margin: 0 0 4px; }
+    p { margin: 0 0 12px; }
+    p:last-child { margin-bottom: 0; }
+    b, strong { font-weight: 800; }
+
+    .window { background: var(--cream); border: 3px solid var(--ink); border-radius: 20px; box-shadow: 0 6px 0 var(--ink); padding: 24px clamp(16px, 4vw, 32px); }
+    .eyebrow { font-size: .78rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0; }
+    .muted { color: var(--muted); }
+    .panel { background: var(--paper); border: 2px solid var(--ink); border-radius: 14px; padding: 14px 16px; }
+
+    /* Hero */
+    .hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px; align-items: center; }
+    .lede { font-size: 1.2rem; font-weight: 700; max-width: 38ch; }
+    .hero-slots { display: grid; grid-template-columns: repeat(2, 64px); gap: 8px; }
+    @media (max-width: 620px) {
+      .hero { grid-template-columns: 1fr; }
+      .hero-slots { grid-template-columns: repeat(4, 64px); }
+    }
+    .slot { width: 64px; height: 64px; border-radius: 12px; background: var(--paper); border: 2px solid var(--ink); box-shadow: 0 3px 0 var(--ink); position: relative; display: grid; place-items: center; }
+
+    /* Icons and tags */
+    .ico { width: 48px; height: 48px; display: block; }
+    .ico.sm { width: 28px; height: 28px; flex-shrink: 0; }
+    .ico.big { width: 104px; height: 104px; animation: float 2.4s ease-in-out infinite; }
+    .badge { position: absolute; top: -8px; right: -8px; font-family: 'Pixelify Sans', ui-monospace, monospace; font-size: .62rem; background: var(--gold); color: var(--ink); border: 2px solid var(--ink); border-radius: 999px; padding: 0 5px; line-height: 1.4; animation: bob 1.6s ease-in-out infinite; }
+    .badge.inline { position: static; animation: none; flex-shrink: 0; }
+    @keyframes bob { 50% { transform: translateY(-3px); } }
+    @keyframes float { 50% { transform: translateY(-5px) rotate(-2deg); } }
+
+    /* Users */
+    .users { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 14px; }
+    .user.todo { border-style: dashed; }
+    .todo-tag { font-family: 'Pixelify Sans', ui-monospace, monospace; font-size: .72rem; background: var(--butter); border: 2px solid var(--ink); border-radius: 999px; padding: 0 8px; display: inline-block; margin-bottom: 8px; }
+    .user .who { font-size: .9rem; color: var(--muted); margin-bottom: 10px; }
+    blockquote { margin: 0 0 10px; padding-left: 12px; border-left: 4px solid var(--blush); font-style: italic; }
+    .user .learned { font-size: .92rem; }
+
+    /* Demo: list + inspect */
+    .demo { background: var(--cream); border: 3px solid var(--ink); border-radius: 18px; box-shadow: 0 5px 0 var(--ink); padding: 14px; margin: 16px 0 8px; }
+    .tabs { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+    .tab { font: 500 .88rem 'Pixelify Sans', ui-monospace, monospace; color: var(--ink); padding: 4px 12px; border: 2px solid var(--ink); border-radius: 10px 10px 4px 4px; background: var(--paper); opacity: .6; cursor: pointer; }
+    .tab:hover { opacity: .85; }
+    .tab.on { background: var(--blush); opacity: 1; box-shadow: 0 2px 0 var(--ink); }
+    .tab .count { display: inline-block; min-width: 1.4em; margin-left: 4px; padding: 0 4px; border-radius: 6px; background: var(--paper); border: 1.5px solid var(--ink); font-size: .72rem; text-align: center; }
+    .tab.bump { animation: bump .5s ease-out; }
+    @keyframes bump { 30% { transform: translateY(-6px) scale(1.06); } 60% { transform: translateY(1px); } }
+    .split { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 14px; }
+    @media (max-width: 620px) { .split { grid-template-columns: 1fr; } }
+    .list { background: var(--paper); border: 2px solid var(--ink); border-radius: 12px; padding: 6px; align-self: start; }
+    .li { display: flex; align-items: center; gap: 8px; width: 100%; padding: 6px 8px; border: 0; border-radius: 8px; background: none; color: var(--ink); font: 700 .9rem 'Nunito', system-ui, sans-serif; text-align: left; cursor: pointer; transition: transform .3s ease, opacity .3s ease; }
+    .li.on { background: var(--butter); box-shadow: inset 0 0 0 2px var(--ink); }
+    .li.leaving { transform: translateX(48px) scale(.9); opacity: 0; }
+    .li-name { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .li-kind { font-size: .66rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+    .empty { margin: 0; padding: 18px 10px; text-align: center; color: var(--muted); font-style: italic; }
+    .detail { background: var(--paper); border: 2px solid var(--ink); border-radius: 12px; padding: 12px; }
+    .pedestal { height: 122px; display: grid; place-items: center; background: radial-gradient(circle at 50% 72%, var(--butter) 0 36%, transparent 38%), var(--slot); border-radius: 10px; margin-bottom: 10px; border: 2px dashed var(--slot-edge); }
+    .card-kind { font-size: .68rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 800; }
+    .card-name { font-family: 'Pixelify Sans', ui-monospace, monospace; font-size: 1.1rem; line-height: 1.2; margin: 2px 0 6px; }
+    .status { font-size: .78rem; font-weight: 800; padding: 2px 8px; border-radius: 8px; background: var(--mint); display: inline-block; margin-bottom: 8px; }
+    .status.new { background: #ffe3a3; }
+    .rows { display: grid; gap: 3px; font-size: .84rem; }
+    .row { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px dashed var(--slot-edge); padding-bottom: 2px; }
+    .row > span:first-child { color: var(--muted); }
+    .row b { text-align: right; }
+    .stars { color: #c47d00; letter-spacing: 1px; }
+    .stars .off { color: var(--slot-edge); }
+    .unrated { color: var(--muted); font-style: italic; }
+    .move { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+    .btn { font: 500 .88rem 'Pixelify Sans', ui-monospace, monospace; border: 2px solid var(--ink); background: var(--blush); color: var(--ink); border-radius: 10px; padding: 4px 12px; box-shadow: 0 3px 0 var(--ink); cursor: pointer; }
+    .btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--ink); }
+    .btn.alt { background: var(--paper); }
+    .toast { min-height: 1.6em; margin: 10px 2px 0; font-size: .85rem; font-weight: 800; }
+    .caption { font-size: .9rem; color: var(--muted); }
+
+    .features { list-style: none; padding: 0; margin: 16px 0; display: grid; gap: 8px; }
+    .features li { padding-left: 26px; position: relative; }
+    .features li::before { content: '✦'; position: absolute; left: 4px; top: 0; color: #c47d00; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: .92rem; background: var(--paper); border: 2px solid var(--ink); border-radius: 14px; overflow: hidden; }
+    th, td { text-align: left; vertical-align: top; padding: 8px 12px; border-bottom: 1px dashed var(--slot-edge); }
+    tr:last-child td { border-bottom: 0; }
+    th { font-family: 'Pixelify Sans', ui-monospace, monospace; font-weight: 700; background: var(--slot); border-bottom: 2px solid var(--ink); }
+    td:first-child { font-weight: 800; white-space: nowrap; }
+
+    /* Focus */
+    .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); gap: 12px; margin-top: 14px; }
+    .tiles p { font-size: .92rem; }
+
+    /* Roadmap */
+    .road { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; }
+    .stop { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 14px; align-items: start; }
+    @media (max-width: 620px) { .stop { grid-template-columns: 1fr; gap: 6px; } }
+    .date { font-family: 'Pixelify Sans', ui-monospace, monospace; font-size: .9rem; background: var(--blush); border: 2px solid var(--ink); border-radius: 10px; padding: 4px 10px; justify-self: start; box-shadow: 0 2px 0 var(--ink); }
+    .date.v { background: var(--gold); }
+    .stop ul { margin: 6px 0 0; padding-left: 20px; }
+    .stop li { margin-bottom: 2px; }
+    .stop .panel h3 small { font-family: 'Nunito', system-ui, sans-serif; font-weight: 700; font-size: .8rem; color: var(--muted); }
+
+    .stack-list { margin: 14px 0 0; display: grid; gap: 8px; }
+    .stack-list p { margin: 0; }
+    footer { text-align: center; font-size: .85rem; color: var(--muted); }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-nb-spiral" viewBox="0 0 48 48">
+        <rect x="12" y="5" width="28" height="38" rx="3" fill="currentColor" stroke="#3b2f3a" stroke-width="2"/>
+        <rect x="19" y="11" width="15" height="9" rx="1.5" fill="#fffdf8" stroke="#3b2f3a" stroke-width="1.2"/>
+        <path d="M22 14.5h9M22 17h6" stroke="#3b2f3a" stroke-width="1" stroke-linecap="round"/>
+        <g fill="#fffdf8" stroke="#3b2f3a" stroke-width="1.4">
+          <rect x="9" y="8" width="7" height="3" rx="1.5"/><rect x="9" y="14" width="7" height="3" rx="1.5"/>
+          <rect x="9" y="20" width="7" height="3" rx="1.5"/><rect x="9" y="26" width="7" height="3" rx="1.5"/>
+          <rect x="9" y="32" width="7" height="3" rx="1.5"/><rect x="9" y="38" width="7" height="3" rx="1.5"/>
+        </g>
+      </symbol>
+      <symbol id="i-nb-sewn" viewBox="0 0 48 48">
+        <rect x="12" y="5" width="28" height="38" rx="2" fill="currentColor" stroke="#3b2f3a" stroke-width="2"/>
+        <path d="M16.5 5v38" stroke="#3b2f3a" stroke-width="1.2" stroke-opacity=".45"/>
+        <rect x="21" y="12" width="14" height="8" rx="1" fill="#fffdf8" stroke="#3b2f3a" stroke-width="1.2"/>
+        <path d="M24 15h8M24 17.5h5" stroke="#3b2f3a" stroke-width="1" stroke-linecap="round"/>
+      </symbol>
+      <symbol id="i-fountain" viewBox="0 0 48 48">
+        <g transform="rotate(40 24 24)">
+          <rect x="20" y="3" width="8" height="27" rx="4" fill="currentColor" stroke="#3b2f3a" stroke-width="2"/>
+          <rect x="27" y="5" width="2.5" height="13" rx="1.2" fill="#d7d9e0" stroke="#3b2f3a" stroke-width="1.2"/>
+          <path d="M21 30h6v5h-6z" fill="#4a4550" stroke="#3b2f3a" stroke-width="1.6"/>
+          <path d="M21.2 35 L24 45 L26.8 35 Z" fill="#e8c35a" stroke="#3b2f3a" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M24 37v5" stroke="#3b2f3a" stroke-width="1"/>
+        </g>
+      </symbol>
+      <symbol id="i-gel" viewBox="0 0 48 48">
+        <g transform="rotate(40 24 24)">
+          <rect x="20.5" y="3" width="7" height="31" rx="3.5" fill="currentColor" stroke="#3b2f3a" stroke-width="2"/>
+          <rect x="26.5" y="4" width="2.5" height="14" rx="1.2" fill="currentColor" stroke="#3b2f3a" stroke-width="1.2"/>
+          <path d="M21.5 34 L24 42 L26.5 34 Z" fill="#d7d9e0" stroke="#3b2f3a" stroke-width="1.6" stroke-linejoin="round"/>
+          <circle cx="24" cy="43.2" r="1.2" fill="#3b2f3a"/>
+        </g>
+      </symbol>
+      <symbol id="i-pencil" viewBox="0 0 48 48">
+        <g transform="rotate(40 24 24)">
+          <rect x="20" y="3" width="8" height="30" rx="1.5" fill="currentColor" stroke="#3b2f3a" stroke-width="2"/>
+          <path d="M22.7 4v28M25.3 4v28" stroke="#3b2f3a" stroke-opacity=".35" stroke-width="1"/>
+          <path d="M20 33 L24 44 L28 33 Z" fill="#f3d2a2" stroke="#3b2f3a" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M22.5 40 L24 44 L25.5 40 Z" fill="#3b2f3a"/>
+        </g>
+      </symbol>
+      <symbol id="i-mech" viewBox="0 0 48 48">
+        <g transform="rotate(40 24 24)">
+          <rect x="20.5" y="3" width="7" height="27" rx="2" fill="currentColor" stroke="#3b2f3a" stroke-width="2"/>
+          <rect x="27" y="5" width="2.2" height="12" rx="1" fill="#d7d9e0" stroke="#3b2f3a" stroke-width="1.2"/>
+          <path d="M21.5 22h5M21.5 24.5h5M21.5 27h5" stroke="#3b2f3a" stroke-width="1"/>
+          <path d="M20.5 30 L24 38 L27.5 30 Z" fill="#d7d9e0" stroke="#3b2f3a" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M24 38v6" stroke="#3b2f3a" stroke-width="1.6" stroke-linecap="round"/>
+        </g>
+      </symbol>
+      <symbol id="i-highlighter" viewBox="0 0 48 48">
+        <g transform="rotate(40 24 24)">
+          <rect x="18" y="4" width="12" height="25" rx="3.5" fill="currentColor" stroke="#3b2f3a" stroke-width="2"/>
+          <rect x="21" y="9" width="6" height="12" rx="1.5" fill="#fffdf8" fill-opacity=".6"/>
+          <path d="M19 29h10l-1.5 6h-7z" fill="#fffdf8" stroke="#3b2f3a" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M21 35h6l-1 7h-4z" fill="currentColor" stroke="#3b2f3a" stroke-width="1.6" stroke-linejoin="round"/>
+        </g>
+      </symbol>
+    </defs>
+  </svg>
+
+  <main>
+    <header class="window hero">
+      <div>
+        <p class="eyebrow">Design, Build, Ship · Project proposal · Nikita Basu</p>
+        <h1>Stationery Inventory</h1>
+        <p class="lede">For stationery lovers who keep buying notebooks they already own: see everything you have, where it lives, and what's still waiting to be used.</p>
+      </div>
+      <div class="hero-slots" aria-hidden="true">
+        <div class="slot"><svg class="ico" style="color:#4b4f63"><use href="#i-nb-spiral"/></svg><span class="badge">NEW</span></div>
+        <div class="slot"><svg class="ico" style="color:#8fc1ea"><use href="#i-fountain"/></svg></div>
+        <div class="slot"><svg class="ico" style="color:#4f7fc4"><use href="#i-pencil"/></svg></div>
+        <div class="slot"><svg class="ico" style="color:#a8d5ee"><use href="#i-highlighter"/></svg></div>
+      </div>
+    </header>
+
+    <section class="window" aria-labelledby="problem">
+      <h2 id="problem"><span class="num">01</span> The problem</h2>
+      <p>I've bought many notebooks I didn't need, because I thought I didn't have one. In a shop or shopping online, I bought another spiral-bound A5 graph notebook, and one was already waiting for me on my bookshelf, where I keep all my empty notebooks.</p>
+      <p>So this isn't an app for remembering where I put things. It's for knowing what I already have, so I don't buy more of the same, and for reaching for the brand-new notebook that's waiting for me.</p>
+    </section>
+
+    <section class="window" aria-labelledby="users">
+      <h2 id="users"><span class="num">02</span> What my users told me</h2>
+      <p>I asked three people with a stationery stash about the last notebook or pen they bought, what's in their bag right now, and whether they've ever tried to keep track of what they own.</p>
+      <div class="users">
+        <article class="panel user todo">
+          <span class="todo-tag">To fill in after the interview</span>
+          <h3>Isha</h3>
+          <p class="who">[Who Isha is, in one line]</p>
+          <blockquote>[A quote from the interview, in Isha's words]</blockquote>
+          <blockquote>[Another quote]</blockquote>
+          <p class="learned"><b>What I learned:</b> [one line]</p>
+        </article>
+        <article class="panel user todo">
+          <span class="todo-tag">To fill in after the interview</span>
+          <h3>[Name]</h3>
+          <p class="who">[Who they are, in one line]</p>
+          <blockquote>[A quote from the interview, in their words]</blockquote>
+          <blockquote>[Another quote]</blockquote>
+          <p class="learned"><b>What I learned:</b> [one line]</p>
+        </article>
+        <article class="panel user todo">
+          <span class="todo-tag">To fill in after the interview</span>
+          <h3>[Name]</h3>
+          <p class="who">[Who they are, in one line]</p>
+          <blockquote>[A quote from the interview, in their words]</blockquote>
+          <blockquote>[Another quote]</blockquote>
+          <p class="learned"><b>What I learned:</b> [one line]</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="window" aria-labelledby="how">
+      <h2 id="how"><span class="num">03</span> How it works</h2>
+      <p>Your stash lives in three places: your work backpack, your home desk and your bookshelf. Open one to see what's inside, like the inventory screen in a video game.</p>
+
+      <div class="demo">
+        <div class="tabs" id="demoTabs" role="tablist" aria-label="Places"></div>
+        <div class="split">
+          <div class="list" id="demoList" aria-label="Items in this place"></div>
+          <div class="detail" id="demoDetail"></div>
+        </div>
+        <p class="toast" id="demoToast" aria-live="polite"></p>
+      </div>
+      <p class="caption">Try it: switch places, hover over an item or tap it, and move it somewhere else. The items are samples, plus my Mnemosyne.</p>
+
+      <ul class="features">
+        <li><b>Inspect an item</b> to see its details and your own ratings.</li>
+        <li><b>NEW means unused.</b> Unused items carry a NEW tag and show how long they've been waiting.</li>
+        <li><b>"Do I already have this?"</b> In a shop, pick the type and its details, and see everything you own that matches.</li>
+        <li><b>"Move to…"</b> sends an item to another place, so the bag and the shelf match real life.</li>
+      </ul>
+
+      <p>Version one covers four kinds of stationery. The details are what a duplicate check matches on; the ratings are your own.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th scope="col">Type</th><th scope="col">Details</th><th scope="col">Your ratings</th></tr></thead>
+          <tbody>
+            <tr><td>Notebooks</td><td>Size, ruling, binding, paper thickness, fountain-pen friendly</td><td>How the paper feels</td></tr>
+            <tr><td>Pens</td><td>Type, tip or nib size, the ink inside, refillable</td><td>Smoothness, drying time</td></tr>
+            <tr><td>Pencils</td><td>Type, lead size, hardness</td><td>—</td></tr>
+            <tr><td>Highlighters</td><td>Colour, tip shape, type, whether it smears ink</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="window" aria-labelledby="focus">
+      <h2 id="focus"><span class="num">04</span> My focus: Design</h2>
+      <p>The whole app will work end to end: people sign up and log their real stash. The part I'm going deep on is design, because I'm focusing on the user experience and the graphics.</p>
+      <div class="tiles">
+        <div class="panel"><h3>Visual design</h3><p>An illustrated bag, desk and bookshelf, item icons coloured like the real thing, and one cozy video-game style.</p></div>
+        <div class="panel"><h3>Flows</h3><p>Adding an item, checking for a duplicate in a shop, and moving an item between places.</p></div>
+        <div class="panel"><h3>States</h3><p>An empty bag, a NEW item waiting to be used, "you already own 2 like this," and "nothing like this yet."</p></div>
+        <div class="panel"><h3>Accessibility</h3><p>It works by keyboard, respects reduced motion, and screen readers read out each item's details.</p></div>
+      </div>
+    </section>
+
+    <section class="window" aria-labelledby="roadmap">
+      <h2 id="roadmap"><span class="num">05</span> Roadmap</h2>
+      <ol class="road">
+        <li class="stop">
+          <span class="date v">Nov 10–17</span>
+          <div class="panel">
+            <h3>v1: it works end to end</h3>
+            <ul>
+              <li>Sign up and log in</li>
+              <li>Add, edit and delete notebooks, pens, pencils and highlighters, each with its details, ratings, status and place</li>
+              <li>The work backpack, home desk and bookshelf, each a list you can inspect</li>
+              <li>NEW tags and "waiting X days" on unused items</li>
+              <li>The "Do I already have this?" search</li>
+              <li>"Move to…", without the animation yet</li>
+              <li>Isha and my other two interviewees sign up and log their real stash</li>
+            </ul>
+          </div>
+        </li>
+        <li class="stop">
+          <span class="date">Nov 17–24</span>
+          <div class="panel">
+            <h3>It feels like a game</h3>
+            <ul>
+              <li>An illustrated bag, desk and bookshelf</li>
+              <li>Item icons coloured like the real thing</li>
+              <li>The open-the-bag and move animations</li>
+              <li>Fixes from v1 feedback</li>
+            </ul>
+          </div>
+        </li>
+        <li class="stop">
+          <span class="date v">Nov 24–Dec 1</span>
+          <div class="panel">
+            <h3>v2 at the fair <small>Thanksgiving week</small></h3>
+            <ul>
+              <li>A bookshelf you can browse</li>
+              <li>A "use me next" pick from your unused items</li>
+              <li>Every state polished: an empty bag, "you already own 2 like this," "nothing like this yet"</li>
+              <li>An accessibility pass: keyboard, reduced motion, screen readers</li>
+              <li>A demo collection for the fair</li>
+            </ul>
+          </div>
+        </li>
+      </ol>
+      <div class="stack-list">
+        <p><b>Leaving out:</b> barcode or photo scanning, prices and shop links, sharing collections, and item types beyond these four.</p>
+        <p><b>Riskiest part first:</b> the animations, because they're my focus and the approach isn't proven yet. I'll build one small animation during v1 week.</p>
+      </div>
+    </section>
+
+    <section class="window" aria-labelledby="stack">
+      <h2 id="stack"><span class="num">06</span> Stack, MCP servers and CLIs</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th scope="col">Piece</th><th scope="col">Why it fits</th></tr></thead>
+          <tbody>
+            <tr><td>Next.js + Tailwind</td><td>I've built my last few assignments on it, so setup is quick and the time goes into design.</td></tr>
+            <tr><td>Clerk</td><td>Real sign-ups, so Isha and the others each get their own account.</td></tr>
+            <tr><td>Supabase</td><td>Stores everyone's items and places. Row-level security keeps each stash private.</td></tr>
+            <tr><td>Motion</td><td>Animates the bag opening and items moving between places, and turns animation off for anyone who has asked their device for reduced motion.</td></tr>
+            <tr><td>Vercel</td><td>Hosting for the app and for this page.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="stack-list">
+        <p><b>MCP servers:</b> the Supabase MCP server creates the tables and the row-level security rules, and Claude's built-in browser checks every screen and animation at phone and laptop widths.</p>
+        <p><b>CLIs:</b> <code>vercel</code> to deploy, <code>gh</code> and <code>git</code> for the repo, <code>npm</code> for packages, and Playwright for a privacy test that proves Isha can't see my stash.</p>
+        <p><b>Free tiers:</b> every service stays on its free tier, with usage limits and alerts turned on wherever they're offered.</p>
+      </div>
+    </section>
+
+    <footer>Nikita Basu · MPCS 51238 Design, Build, Ship · Autumn 2026</footer>
+  </main>
+
+  <script>
+    (function () {
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const PLACES = [['bag', 'Work backpack'], ['desk', 'Home desk'], ['shelf', 'Bookshelf']];
+      const ITEMS = [
+        { id: 'midori', place: 'bag', brand: 'Midori', name: 'MD Notebook A5', kind: 'Notebook', icon: 'i-nb-sewn', color: '#e6d6b8', note: 'About half full',
+          details: [['Size', 'A5'], ['Binding', 'Thread-sewn'], ['Ruling', 'Lined'], ['Fountain pen', 'Friendly ✓']], ratings: [['Feel', 5]] },
+        { id: 'lamy', place: 'bag', brand: 'LAMY', name: 'Safari, F nib', kind: 'Pen', icon: 'i-fountain', color: '#8fc1ea',
+          details: [['Type', 'Fountain'], ['Nib', 'F'], ['Ink', 'LAMY blue cartridge'], ['Refill', 'Refillable ✓']], ratings: [['Smoothness', 4], ['Drying time', 3]] },
+        { id: 'sarasa', place: 'bag', brand: 'Zebra', name: 'Sarasa Clip 0.5', kind: 'Pen', icon: 'i-gel', color: '#f4a3bd',
+          details: [['Type', 'Gel'], ['Tip', '0.5'], ['Ink', 'Black gel'], ['Refill', 'Refillable ✓']], ratings: [['Smoothness', 4], ['Drying time', 4]] },
+        { id: 'mild', place: 'bag', brand: 'Zebra', name: 'Mildliner, Mild Blue', kind: 'Highlighter', icon: 'i-highlighter', color: '#a8d5ee',
+          details: [['Colour', 'Mild Blue'], ['Tip', 'Chisel + fine'], ['Type', 'Liquid'], ['Smears ink', 'Not tested']], ratings: [] },
+        { id: 'graphgear', place: 'desk', brand: 'Pentel', name: 'GraphGear 1000', kind: 'Pencil', icon: 'i-mech', color: '#9aa1b0',
+          details: [['Type', 'Mechanical'], ['Lead', '0.5 mm'], ['Hardness', 'HB']], ratings: [] },
+        { id: 'lumo', place: 'desk', brand: 'Staedtler', name: 'Mars Lumograph 2B', kind: 'Pencil', icon: 'i-pencil', color: '#4f7fc4', unused: 'Waiting 12 days',
+          details: [['Type', 'Wooden'], ['Hardness', '2B']], ratings: [] },
+        { id: 'mnemo', place: 'shelf', brand: 'Maruman', name: 'Mnemosyne A5 Spiral', kind: 'Notebook', icon: 'i-nb-spiral', color: '#4b4f63', unused: 'Waiting 47 days',
+          details: [['Size', 'A5'], ['Binding', 'Spiral'], ['Ruling', 'Graph'], ['Paper', '80 gsm'], ['Fountain pen', 'Friendly ✓']], ratings: [['Feel', null]] },
+        { id: 'leuchtturm', place: 'shelf', brand: 'Leuchtturm1917', name: 'A5 Dotted', kind: 'Notebook', icon: 'i-nb-sewn', color: '#2f6f6a', unused: 'Waiting 90 days',
+          details: [['Size', 'A5'], ['Binding', 'Thread-sewn'], ['Ruling', 'Dotted'], ['Paper', '80 gsm'], ['Fountain pen', 'Not tested']], ratings: [['Feel', null]] },
+      ];
+
+      const tabsEl = document.getElementById('demoTabs');
+      const listEl = document.getElementById('demoList');
+      const detailEl = document.getElementById('demoDetail');
+      const toastEl = document.getElementById('demoToast');
+      let current = 'bag';
+      let selectedId = null;
+      let moveMenuOpen = false;
+
+      const placeName = id => PLACES.find(([p]) => p === id)[1];
+      const itemsIn = place => ITEMS.filter(it => it.place === place);
+      const icon = (it, size) => `<svg class="ico ${size}" style="color:${it.color}" aria-hidden="true"><use href="#${it.icon}"/></svg>`;
+      const stars = n => n == null
+        ? '<span class="unrated">Not rated yet</span>'
+        : `<span class="stars" aria-label="${n} out of 5">${'★'.repeat(n)}<span class="off">${'★'.repeat(5 - n)}</span></span>`;
+      const status = it => it.unused
+        ? `<div class="status new">✦ Unused · ${it.unused}</div>`
+        : `<div class="status">In use${it.note ? ' · ' + it.note : ''}</div>`;
+
+      function renderTabs(bumped) {
+        tabsEl.innerHTML = PLACES.map(([id, name]) =>
+          `<button type="button" role="tab" class="tab${id === current ? ' on' : ''}${id === bumped ? ' bump' : ''}" aria-selected="${id === current}" data-place="${id}">${name}<span class="count">${itemsIn(id).length}</span></button>`
+        ).join('');
+      }
+
+      function renderList() {
+        const items = itemsIn(current);
+        if (!items.some(it => it.id === selectedId)) selectedId = items.length ? items[0].id : null;
+        listEl.innerHTML = items.length
+          ? items.map(it => `<button type="button" class="li${it.id === selectedId ? ' on' : ''}" data-id="${it.id}">${icon(it, 'sm')}<span class="li-name">${it.name}</span>${it.unused ? '<span class="badge inline">NEW</span>' : ''}<span class="li-kind">${it.kind}</span></button>`).join('')
+          : '<p class="empty">Nothing in here yet.</p>';
+      }
+
+      function renderDetail() {
+        const it = ITEMS.find(i => i.id === selectedId);
+        if (!it) {
+          detailEl.innerHTML = '<p class="empty">Move something here to fill it up.</p>';
+          return;
+        }
+        const rows = it.details.map(([k, v]) => `<div class="row"><span>${k}</span><b>${v}</b></div>`).join('')
+          + it.ratings.map(([k, v]) => `<div class="row"><span>${k}</span>${stars(v)}</div>`).join('');
+        const destinations = moveMenuOpen
+          ? PLACES.filter(([id]) => id !== it.place).map(([id, name]) => `<button type="button" class="btn alt" data-to="${id}">${name}</button>`).join('')
+          : '';
+        detailEl.innerHTML = `<div class="pedestal">${icon(it, 'big')}</div>
+          <div class="card-kind">${it.kind} · ${it.brand}</div>
+          <div class="card-name">${it.name}</div>
+          ${status(it)}
+          <div class="rows">${rows}</div>
+          <div class="move"><button type="button" class="btn" data-move aria-expanded="${moveMenuOpen}">Move to… ▸</button>${destinations}</div>`;
+      }
+
+      function render(bumped) {
+        renderTabs(bumped);
+        renderList();
+        renderDetail();
+      }
+
+      tabsEl.addEventListener('click', e => {
+        const tab = e.target.closest('[data-place]');
+        if (!tab) return;
+        current = tab.dataset.place;
+        selectedId = null;
+        moveMenuOpen = false;
+        render();
+      });
+
+      const select = e => {
+        const row = e.target.closest('[data-id]');
+        if (!row || row.dataset.id === selectedId) return;
+        selectedId = row.dataset.id;
+        moveMenuOpen = false;
+        listEl.querySelectorAll('.li').forEach(r => r.classList.toggle('on', r === row));
+        renderDetail();
+      };
+      listEl.addEventListener('mouseover', select);
+      listEl.addEventListener('focusin', select);
+      listEl.addEventListener('click', select);
+
+      detailEl.addEventListener('click', e => {
+        if (e.target.closest('[data-move]')) {
+          moveMenuOpen = !moveMenuOpen;
+          renderDetail();
+          return;
+        }
+        const target = e.target.closest('[data-to]');
+        if (!target) return;
+        const it = ITEMS.find(i => i.id === selectedId);
+        const row = listEl.querySelector(`[data-id="${it.id}"]`);
+        const finish = () => {
+          it.place = target.dataset.to;
+          selectedId = null;
+          moveMenuOpen = false;
+          toastEl.textContent = `✦ Moved ${it.name} to ${placeName(it.place)}`;
+          render(it.place);
+        };
+        if (reduceMotion || !row) return finish();
+        row.classList.add('leaving');
+        setTimeout(finish, 320);
+      });
+
+      render();
+    })();
+  </script>
+</body>
+</html>
