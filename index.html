@@ -71,8 +71,6 @@
 
     /* Users */
     .users { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 14px; }
-    .user.todo { border-style: dashed; }
-    .todo-tag { font-family: 'Fredoka', system-ui, sans-serif; font-weight: 600; font-size: .72rem; background: var(--butter); border: 2px solid var(--ink); border-radius: 999px; padding: 0 8px; display: inline-block; margin-bottom: 8px; }
     .user .who { font-size: .9rem; color: var(--muted); margin-bottom: 10px; }
     blockquote { margin: 0 0 10px; padding-left: 12px; border-left: 4px solid var(--blush); font-style: italic; }
     .user .learned { font-size: .92rem; }
@@ -237,29 +235,26 @@
       <h2 id="users"><span class="num">02</span> What my users told me</h2>
       <p>I asked three people with a stationery stash about the last notebook or pen they bought, what's in their bag right now, and whether they've ever tried to keep track of what they own.</p>
       <div class="users">
-        <article class="panel user todo">
-          <span class="todo-tag">To fill in after the interview</span>
+        <article class="panel user">
           <h3>Isha</h3>
-          <p class="who">[Who Isha is, in one line]</p>
-          <blockquote>[A quote from the interview, in Isha's words]</blockquote>
-          <blockquote>[Another quote]</blockquote>
-          <p class="learned"><b>What I learned:</b> [one line]</p>
+          <p class="who">Places big online stationery orders, carries an everyday set for work, and keeps the rest on a bookshelf.</p>
+          <blockquote>Sometimes I buy duplicate items, sometimes intentionally sometimes no. I like to have multiple things to stock up my supply.</blockquote>
+          <blockquote>I have a bookshelf with my stationery. I have been meaning to create an inventory list for everything.</blockquote>
+          <p class="learned"><b>What I learned:</b> Not every duplicate is a mistake. Isha stocks up on purpose, so the app should show a count instead of a warning.</p>
         </article>
-        <article class="panel user todo">
-          <span class="todo-tag">To fill in after the interview</span>
-          <h3>[Name]</h3>
-          <p class="who">[Who they are, in one line]</p>
-          <blockquote>[A quote from the interview, in their words]</blockquote>
-          <blockquote>[Another quote]</blockquote>
-          <p class="learned"><b>What I learned:</b> [one line]</p>
+        <article class="panel user">
+          <h3>Anisha</h3>
+          <p class="who">Collects cute notebooks, and carries one pen and one notebook day to day.</p>
+          <blockquote>I collect cute notebooks and never use them. I definitely have at least 5 or 6 that I haven't touched from when I was younger.</blockquote>
+          <blockquote>But I won't do an inventory for everything that's in my house.</blockquote>
+          <p class="learned"><b>What I learned:</b> Adding things has to take seconds. Anisha has kept inventories for groceries, but wouldn't keep one for everything at home.</p>
         </article>
-        <article class="panel user todo">
-          <span class="todo-tag">To fill in after the interview</span>
-          <h3>[Name]</h3>
-          <p class="who">[Who they are, in one line]</p>
-          <blockquote>[A quote from the interview, in their words]</blockquote>
-          <blockquote>[Another quote]</blockquote>
-          <p class="learned"><b>What I learned:</b> [one line]</p>
+        <article class="panel user">
+          <h3>Kaitlyn</h3>
+          <p class="who">Tutors, keeps one spiral notebook as a catch-all, and writes only in pencil.</p>
+          <blockquote>In college I was serial notebook buyer, and I would not finish them, and I would donate them when they were empty. So now I try not to buy them.</blockquote>
+          <blockquote>I wanted a spiral bound one because it gets annoying if it's not spiral bound.</blockquote>
+          <p class="learned"><b>What I learned:</b> Kaitlyn stopped buying notebooks because they never got finished, but still has unused ones. Binding alone was reason enough to buy another.</p>
         </article>
       </div>
     </section>
