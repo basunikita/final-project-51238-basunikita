@@ -1,4 +1,22 @@
 .DS_Store
 .vercel/
-.claude/
+.claude/*
+!.claude/settings.json
 .superpowers/
+
+# dependencies
+/node_modules
+
+# next.js
+/.next/
+next-env.d.ts
+*.tsbuildinfo
+
+# env files hold keys and are never committed
+.env*
+
+# playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
