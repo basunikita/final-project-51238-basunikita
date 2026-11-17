@@ -1,4 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
+import { navigation } from "next/cache";
 import { resolveSelection } from "@/lib/inventory";
 import { loadInventory } from "@/lib/inventory-server";
 import InventoryScreen from "./InventoryScreen";
@@ -9,6 +10,9 @@ function first(value: string | string[] | undefined): string | undefined {
 
 export default async function InventoryPage({ searchParams }: PageProps<"/inventory">) {
   await auth.protect();
+  // Load the stash only on the actual visit. A prefetch would abandon the
+  // database request halfway and cache "Your stash didn't open" instead.
+  await navigation();
   const inventory = await loadInventory();
   if (!inventory.ok) {
     return (
