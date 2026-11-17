@@ -44,7 +44,7 @@ Row-level security is on for both tables. Signed-in people (`authenticated`) can
 
 ## Commands
 
-- `npm run build`: production build. `next dev` fails in the course sandbox, so check with `rm -rf .next && npm run build`, then `npx next start -p 3000 -H 127.0.0.1`.
+- `npm run build`: production build. `next dev` fails in the course sandbox, so check with `rm -rf .next && npm run build`, then `npx next start -p 3000 -H localhost` and test at http://localhost:3000. Use `localhost`, not `127.0.0.1`: Clerk's middleware hands requests back to `localhost`, which fails when the server listens only on `127.0.0.1`.
 - `npm run lint`: ESLint
 - `npm test`: library tests with `node --test` (tests in `tests/*.test.mjs` import `lib/*.ts` directly, so `lib/` uses only erasable TypeScript: no `enum`, no parameter properties)
 - `npm run e2e`: the Playwright privacy test in `e2e/`. It builds and starts its own app on port 3100 and signs in the two Clerk test users named by `E2E_USER_A_EMAIL` and `E2E_USER_B_EMAIL` in `.env.local`.

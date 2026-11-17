@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 dotenv.config({ path: ".env.local", quiet: true });
 
 const APP_PORT = 3100;
-const APP_URL = `http://127.0.0.1:${APP_PORT}`;
+const APP_URL = `http://localhost:${APP_PORT}`;
 
 export default defineConfig({
   testDir: "e2e",
@@ -16,7 +16,7 @@ export default defineConfig({
   use: { ...devices["Desktop Chrome"], baseURL: APP_URL, trace: "retain-on-failure" },
   webServer: {
     // next dev fails in the course sandbox, so the test runs a production build.
-    command: `npm run build && npx next start -p ${APP_PORT} -H 127.0.0.1`,
+    command: `npm run build && npx next start -p ${APP_PORT} -H localhost`,
     url: APP_URL,
     timeout: 180_000,
   },

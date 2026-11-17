@@ -26,6 +26,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`${fredoka.variable} ${nunito.variable} antialiased`}>
       <body className="min-h-screen">
         <ClerkProvider
+          signInUrl="/sign-in"
+          signUpUrl="/sign-up"
+          signInFallbackRedirectUrl="/inventory"
+          signUpFallbackRedirectUrl="/inventory"
+          afterSignOutUrl="/"
           appearance={{
             variables: {
               colorPrimary: "#3b2f3a",
