@@ -3,7 +3,8 @@
 import { type Item, KIND_LABELS } from "@/lib/inventory";
 import { ItemIcon } from "../ui/ItemIcon";
 
-export type PickHow = "hover" | "focus" | "click";
+// "key" is a click made with Enter or Space.
+export type PickHow = "hover" | "focus" | "click" | "key";
 
 export const ADD_ITEM_BUTTON_ID = "add-item-button";
 
@@ -13,12 +14,14 @@ export function ItemList({
   items,
   selectedId,
   onPick,
+  onLeaveRows,
   onAdd,
 }: {
   placeName: string;
   items: Item[];
   selectedId: number | null;
   onPick: (itemId: number, how: PickHow) => void;
+  onLeaveRows: () => void;
   onAdd: () => void;
 }) {
   const addButton = (
@@ -47,7 +50,7 @@ export function ItemList({
             </span>
             {addButton}
           </div>
-          <ul>
+          <ul onMouseLeave={onLeaveRows}>
             {items.map((item) => {
               const selected = item.id === selectedId;
               return (
@@ -59,7 +62,7 @@ export function ItemList({
                     className={`li ${selected ? "li-on" : ""}`}
                     onMouseEnter={() => onPick(item.id, "hover")}
                     onFocus={() => onPick(item.id, "focus")}
-                    onClick={() => onPick(item.id, "click")}
+                    onClick={(event) => onPick(item.id, event.detail === 0 ? "key" : "click")}
                   >
                     <ItemIcon kind={item.kind} className="size-8" decorative />
                     <span className="li-name">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { type Fail, type Item, itemCounts, type Place } from "@/lib/inventory";
 import {
   addItem,
@@ -56,6 +56,7 @@ export default function InventoryScreen({
   const [editor, setEditor] = useState<Editor>(null);
   const [announcement, setAnnouncement] = useState("");
   const [focusTarget, setFocusTarget] = useState<FocusTarget | null>(null);
+  const pinnedByClick = useRef(false);
 
   const showWelcome = welcoming || places.length === 0;
   const place = places.find((candidate) => candidate.id === placeId) ?? null;
@@ -98,10 +99,17 @@ export default function InventoryScreen({
   }
 
   function pickItem(id: number, how: PickHow) {
-    if (how !== "click" && editor !== null) return;
+    const chosen = how === "click" || how === "key";
+    if (!chosen && editor !== null) return;
+    // After a click, the pointer crosses other rows on its way to Edit or
+    // Delete, so hovering selects again only once it has left the rows.
+    if (how === "hover" && pinnedByClick.current) return;
+    if (chosen) pinnedByClick.current = true;
     setEditor(null);
     setItemId(id);
-    if (how === "click" && window.matchMedia(PHONE_WIDTH).matches) {
+    // Enter moves on to the item's details, so the next Tab reaches its Edit
+    // button instead of selecting each row below it.
+    if (how === "key" || (how === "click" && window.matchMedia(PHONE_WIDTH).matches)) {
       setFocusTarget({ to: "detail" });
     }
   }
@@ -238,6 +246,9 @@ export default function InventoryScreen({
                 items={placeItems}
                 selectedId={item?.id ?? null}
                 onPick={pickItem}
+                onLeaveRows={() => {
+                  pinnedByClick.current = false;
+                }}
                 onAdd={() => {
                   setEditor({ mode: "add" });
                 }}
