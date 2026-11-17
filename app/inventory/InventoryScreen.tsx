@@ -141,6 +141,9 @@ export default function InventoryScreen({
     setItemId(next ? firstItemIn(items, next.id) : null);
     announce(`Deleted ${place.name}.`);
     if (next) setFocusTarget({ to: "tab", placeId: next.id });
+    // With no places left, setting up starts over, and the welcome panel
+    // stays until "Start logging" again.
+    else setWelcoming(true);
     return { ok: true };
   }
 

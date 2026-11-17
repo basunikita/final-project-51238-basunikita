@@ -42,6 +42,25 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               fontFamily: "var(--font-nunito), system-ui, sans-serif",
               borderRadius: "14px",
             },
+            // Clerk's card as one of the app's windows: ink border, solid ink shadow.
+            elements: {
+              cardBox: {
+                border: "3px solid #3b2f3a",
+                borderRadius: "20px",
+                boxShadow: "0 6px 0 #3b2f3a",
+              },
+              headerTitle: { fontFamily: "var(--font-fredoka), system-ui, sans-serif", fontWeight: 600 },
+              formButtonPrimary: {
+                backgroundColor: "#f7cfc8",
+                backgroundImage: "none",
+                color: "#3b2f3a",
+                border: "2px solid #3b2f3a",
+                boxShadow: "0 3px 0 #3b2f3a",
+                fontFamily: "var(--font-fredoka), system-ui, sans-serif",
+                fontWeight: 600,
+                "&:hover": { backgroundColor: "#f3bdb4" },
+              },
+            },
           }}
         >
           {children}
