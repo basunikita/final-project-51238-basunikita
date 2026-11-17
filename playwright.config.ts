@@ -5,7 +5,10 @@ import dotenv from "dotenv";
 dotenv.config({ path: ".env.local", quiet: true });
 
 const APP_PORT = 3100;
-const APP_URL = `http://localhost:${APP_PORT}`;
+// E2E_BASE_URL runs the tests against a deployed site instead of a local build,
+// e.g. E2E_BASE_URL=https://final-project-51238-basunikita.vercel.app npm run e2e
+const LIVE_URL = process.env.E2E_BASE_URL;
+const APP_URL = LIVE_URL ?? `http://localhost:${APP_PORT}`;
 
 export default defineConfig({
   testDir: "e2e",
@@ -14,10 +17,12 @@ export default defineConfig({
   workers: 1,
   reporter: "list",
   use: { ...devices["Desktop Chrome"], baseURL: APP_URL, trace: "retain-on-failure" },
-  webServer: {
-    // next dev fails in the course sandbox, so the test runs a production build.
-    command: `npm run build && npx next start -p ${APP_PORT} -H localhost`,
-    url: APP_URL,
-    timeout: 180_000,
-  },
+  webServer: LIVE_URL
+    ? undefined
+    : {
+        // next dev fails in the course sandbox, so the test runs a production build.
+        command: `npm run build && npx next start -p ${APP_PORT} -H localhost`,
+        url: APP_URL,
+        timeout: 180_000,
+      },
 });
