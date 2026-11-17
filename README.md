@@ -4,7 +4,7 @@ For stationery lovers who keep buying notebooks they already own: see everything
 
 - **Live app:** https://final-project-51238-basunikita.vercel.app
 - **Project proposal:** https://final-project-51238-basunikita.vercel.app/proposal
-- **v2 plan:** written after the first user test, in `docs/v2-plan.md`
+- **v2 plan:** [docs/v2-plan.md](docs/v2-plan.md)
 
 This is my final project for MPCS 51238, Design, Build, Ship. Its focus is Design.
 
